@@ -34,7 +34,7 @@ helm repo add spark-operator https://googlecloudplatform.github.io/spark-on-k8s-
 helm install sparkoperator spark-operator/spark-operator --namespace spark-operator --set sparkJobNamespace=spark-apps,enableWebhook=true
 ```
 
-I actually ran into an issue where the operator was unable to pull an image from GCR. I was able to find this out because when I did `k get pods --all-namespaces`, I saw that the pod for the operator had status of ImagePullBackoff. I fixed this by changing the image for the deployment to be a spark operator image on a GCR instance within the same project as my GKE cluster.
+I actually ran into an issue where the operator was unable to pull an image from GCR. I was able to find this out because when I did `k get pods --all-namespaces`, I saw that the pod for the operator had status of ImagePullBackoff. I fixed this by changing the image for the deployment to be a spark operator image on a GCR instance within the same project as my GKE cluster (I pulled the [image](gcr.io/spark-operator/spark-operator:v1beta2-1.3.0-3.1.1) from GCR locally, tagged it, and re-pushed it to my own GCR instance).
 
 Fix:
 
@@ -46,7 +46,7 @@ kubectl get deployments -n spark-operator
 kubectl edit deployment <deployment_name> -n spark-operator
 
 # Restart the deployment
-kubectl rollout restart deployments/<deployment_name_ -n spark-operator
+kubectl rollout restart deployments/<deployment_name> -n spark-operator
 ```
 
 4. Submit an example job to spark! If you have a YAML file for a SparkApplication, you can apply it to the cluster. For example, let's say that you want to run the example Pi approximation job in `examples/spark-pi.yaml`. You'd do:
