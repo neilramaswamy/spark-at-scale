@@ -1,3 +1,7 @@
+# Source: https://dzlab.github.io/ml/2020/07/14/spark-kubernetes/
+# It's unclear why the steps given on the official operator quick start didn't work.
+# It's unclear why I need this file.
+# But it works.
 apiVersion: v1
 kind: Namespace
 metadata:
