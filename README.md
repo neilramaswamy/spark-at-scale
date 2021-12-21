@@ -71,9 +71,35 @@ kubectl logs -f <pod_name> -n spark-apps
 
 You should see "Pi is roughly 3.14" in those logs!
 
-5. Getting the Spark trace and accessing the UI. This is a TODO, since I have no clue how to do it yet.
+5. Getting the spark traces would be very useful. We can enable this with `.spec.sparkConf.spark.eventLog.enabled`, and we can set a path to log with `.spec.sparkConf.spark.eventLog.dir`. But since we run in pods, the directory won't be as simple as just `/tmp/spark-events/`. How do we resolve this?
 
-6. Run your own jobs. For this, you'll need to write a query, Dockerize it, push the image to a private repository, and then create a job configuration file for it (in `benchmarks/`) and apply it using the steps in step 4.
+Instead of using `/tmp/spark-events/`, we use some Cloud Storage from Google. So we can do something like: `'spark.eventLog.dir': 'gs://spark-log-bucket/spark-events/'`.
+
+6. Accessing the UI while a job runs. Unclear how to get this to work, so we'll leave this as a TODO.
+
+7. Run your own jobs. For this, you'll need to write a query, Dockerize it, push the image to a private repository, and then create a job configuration file for it (in `benchmarks/`) and apply it using the steps in step 4.
+
+Right now, this is sort of working. You can create an image of `src/` using the following:
+
+```
+docker build -f Dockerfile -t gcr.io/neeva-spark/<name> .
+```
+
+And then you can push it to GCR:
+
+```
+docker push gcr.io/neeva-spark/<name>
+```
+
+And then you can take the image URL from GCR and put it into a YAML configuration file, like `spark-pi.yaml`.
+
+# Running Custom Jobs
+
+1. Write the job in `benchmarks/` as something like `job.scala`
+2. Create a Docker image for it (using the provided `Dockerfile` in `benchmarks/`, which is a TODO)
+3. Tag the Docker image, push it to your private GCR instance
+4. Create a resource definition for it using the template in `benchmarks/` (TODO)
+5. Pull the logs (figuring this out is a TODO) so that you can analyze the locally
 
 # Sources
 
